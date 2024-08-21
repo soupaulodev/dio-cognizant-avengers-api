@@ -1,0 +1,34 @@
+spring:
+  application:
+    name: avengers-api
+    version: 1.0.0
+    author: soupaulodev
+    group: br.com.soupaulodev
+
+#  profiles:
+#    active: dev
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    open-in-view: true
+    show-sql: true
+    hibernate:
+      ddl-auto: update
+      properties:
+        format_sql: true
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/avengers
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+springdoc:
+  swagger-ui:
+    path: /api-docs
+    enabled: true
+  openapi:
+    info:
+      version: 1.0.0
+      title: Avengers API
+      description: OpenAPI API documentation for Avengers API
