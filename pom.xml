@@ -76,6 +76,7 @@
     </dependencies>
 
     <build>
+        <finalName>avengers-api-build</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
