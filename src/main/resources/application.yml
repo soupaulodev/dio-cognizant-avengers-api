@@ -4,31 +4,57 @@ spring:
     version: 1.0.0
     author: soupaulodev
     group: br.com.soupaulodev
-
-#  profiles:
-#    active: dev
-
-  jpa:
-    database-platform: org.hibernate.dialect.PostgreSQLDialect
-    open-in-view: true
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      properties:
-        format_sql: true
-
-  datasource:
-    url: jdbc:postgresql://localhost:5432/avengers
-    username: postgres
-    password: postgres
-    driver-class-name: org.postgresql.Driver
-
-springdoc:
-  swagger-ui:
-    path: /api-docs
+  config:
+#    spring:
+#      profiles:
+#        group: br.com.soupaulodev
+#          <group>: dev
+    use-legacy-processing: true
+  profiles:
+    active: dev
+  jmx:
     enabled: true
-  openapi:
-    info:
-      version: 1.0.0
-      title: Avengers API
-      description: OpenAPI API documentation for Avengers API
+  data:
+    jpa:
+      repositories:
+        bootstrap-mode: deferred
+  jpa:
+    open-in-view: true
+    properties:
+      hibernate:
+        time_zone: UTC
+        generate_statistics: false
+        jdbc.batch_size: 25
+        order_inserts: true
+        order_updates: true
+        query:
+          fail_on_pagination_over_collection_fetch: true
+          in_clause_parameter_padding: true
+        physical-strategy: org.springframework.boot.orm.jpa.hibernate.SpringPhysicalNamingStrategy
+        implicit-strategy: org.springframework.boot.orm.jpa.hibernate.SpringImplicitNamingStrategy
+    hibernate:
+      ddl-auto: none
+  main:
+    allow-bean-definition-overriding: true
+  task:
+    execution:
+      thread-name-prefix: avengers-task-
+      pool:
+        core-size: 2
+        max-size: 50
+        queue-capacity: 10000
+    scheduling:
+      thread-name-prefix: avengers-scheduler-
+      pool:
+        size: 2
+  output:
+    ansi:
+      console-available: true
+
+server:
+  port: 9090
+  servlet:
+    session:
+      cookie:
+        http-only: true
+    context-path: /avengers
