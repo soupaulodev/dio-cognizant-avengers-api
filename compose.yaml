@@ -8,19 +8,19 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       ALLOW_IP_RANGE: 0.0.0.0/0
     ports:
-      - "25433:5432"
+      - ${DB_DOCKER_PORT}
     volumes:
       - pdb14:/var/lib/postgresql/data
     networks:
       - postgres-compose-network
 
-  teste-pgadmin-compose:
+  pgadmin-avenger:
     image: dpage/pgadmin4
     environment:
-      PGADMIN_DEFAULT_EMAIL: "avengers@email.com"
-      PGADMIN_DEFAULT_PASSWORD: "123456"
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     ports:
-      - "5556:80"
+      - ${PGADMIN_DOCKER_PORT}
     depends_on:
       - postgres
     networks:
