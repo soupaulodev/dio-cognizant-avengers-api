@@ -1,15 +1,33 @@
+version: '3.8'
 services:
   postgres:
-    container_name: avengers_api_pg
-    image: 'postgres:latest'
+    image: postgres:14-alpine
     environment:
-      - 'POSTGRES_DB=avengers'
-      - 'POSTGRES_PASSWORD=postgres'
-      - 'POSTGRES_USER=postgres'
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      ALLOW_IP_RANGE: 0.0.0.0/0
     ports:
-      - '5432'
+      - "25433:5432"
     volumes:
-      - 'avengers_api_pg_data:/postgresql'
+      - pdb14:/var/lib/postgresql/data
+    networks:
+      - postgres-compose-network
+
+  teste-pgadmin-compose:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: "avengers@email.com"
+      PGADMIN_DEFAULT_PASSWORD: "123456"
+    ports:
+      - "5556:80"
+    depends_on:
+      - postgres
+    networks:
+      - postgres-compose-network
 
 volumes:
-  avengers_api_pg_data:
+  pdb14:
+networks:
+  postgres-compose-network:
+    driver: bridge
