@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.UUID;
+
 public record AvengerRequest(
     @NotNull
     @NotBlank
@@ -23,5 +25,9 @@ public record AvengerRequest(
 
     public Avenger toAvenger() {
         return new Avenger(null, nick, person, description, history);
+    }
+
+    public Avenger toAvenger(UUID id) {
+        return new Avenger(id, nick, person, description, history);
     }
 }

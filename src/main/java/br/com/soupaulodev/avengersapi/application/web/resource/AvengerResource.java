@@ -5,13 +5,12 @@ import br.com.soupaulodev.avengersapi.application.web.resource.response.AvengerR
 import br.com.soupaulodev.avengersapi.domain.avenger.Avenger;
 import br.com.soupaulodev.avengersapi.domain.avenger.AvengerRepository;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.client.HttpClientErrorException;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -31,42 +30,48 @@ public class AvengerResource {
         return ResponseEntity.ok().body(response);
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{id}/detail")
     public ResponseEntity<AvengerResponse> getAvengerDetails (@PathVariable("id") UUID id) {
-        AvengerResponse response = new AvengerResponse(this.repository
-                .getDetail(id)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND)));
+        Optional<Avenger> avenger = this.repository.getDetail(id);
 
-        return ResponseEntity.ok().body(response);
+        if(avenger.isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
+        return ResponseEntity.ok().body(new AvengerResponse(avenger.get()));
     }
 
     @PostMapping
     public ResponseEntity<AvengerResponse> createAvenger (@Valid @RequestBody AvengerRequest request) {
+
+        if(this.repository.getDetail(request.toAvenger().id()).isPresent()) {
+            return ResponseEntity.badRequest().build();
+        }
+
         Avenger avengerCreated = this.repository.create(request.toAvenger());
 
-        AvengerResponse response = new AvengerResponse(avengerCreated);
-        URI uri = URI.create("/v1/api/avenger/" + avengerCreated.id());
-
-        return ResponseEntity.created(uri).body(response);
+        return ResponseEntity
+                .created(URI.create("/v1/api/avenger/" + avengerCreated.id()))
+                .body(new AvengerResponse(avengerCreated));
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<AvengerResponse> updateAvenger (@Valid @RequestBody AvengerRequest request, @PathVariable("id") UUID id) {
-        Avenger avengerDB = this.repository
-                .getDetail(id)
-                .orElseThrow(() -> new HttpClientErrorException(HttpStatus.NOT_FOUND));
-
-        if (avengerDB == null) {
+        if (this.repository.getDetail(id).isEmpty()) {
             return ResponseEntity.notFound().build();
         }
 
-        AvengerResponse response = new AvengerResponse(this.repository.update(request.toAvenger()));
+        Avenger avengerUpdated = this.repository.update(request.toAvenger(id));
 
-        return ResponseEntity.accepted().body(response);
+        return ResponseEntity.accepted().body(new AvengerResponse(avengerUpdated));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteAvenger (@PathVariable("id") UUID id) {
+        if (this.repository.getDetail(id).isEmpty()) {
+            return ResponseEntity.notFound().build();
+        }
+
         this.repository.delete(id);
 
         return ResponseEntity.noContent().build();
